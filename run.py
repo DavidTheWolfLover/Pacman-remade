@@ -21,8 +21,7 @@ class GameControl(object):
 
     def start_game(self):
         #pass
-        self.Nodes = Group_Nodes()
-        self.Nodes.create_nodes()
+        self.Nodes = Group_Nodes("maze.txt")
         self.pacman = Pacman(self.Nodes)
     
     def update(self):

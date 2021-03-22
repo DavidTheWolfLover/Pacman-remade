@@ -18,8 +18,122 @@ class Node(object):
                 pygame.draw.circle(screen,red,start,12)
 
 class Group_Nodes(object):
-    def __init__(self):
+    def __init__(self,map):
         self.points = []
+        self.map = map
+        self.grid = None
+        self.createNodeList(map)
+    
+    def readFile(self, textfile):
+        f = open(textfile, "r")
+        lines = [line.rstrip('\n') for line in f]
+        lines = [line.rstrip('\r') for line in lines]
+        return [line.split(' ') for line in lines]
+    
+    def createNodeList(self,textfile):
+        #near = self.First_Node(len(self.grid),len(self.grid[0]))
+        #isWall = True
+        self.grid = self.readFile(textfile)
+        first = self.First_Node()
+        self.way4(first)
+
+    def check(self, node):
+        for inode in self.points:
+            if node.row == inode.row and node.column == inode.column:
+                
+                return inode
+        return None
+
+    def way4(self,node):
+        k=0
+        nodeleft = None
+        noderight = None
+        nodeup = None
+        nodedown = None
+        i = node.row
+        j = node.column
+        self.points.append(node)
+        if (i+1<len(self.grid)):
+            if (self.grid[i+1][j] != "."):
+                k = i+1
+                while (k<len(self.grid)):
+                    if (self.grid[k][j] == "+"):
+                        nodedown = Node(k,j)
+                        temp = self.check(nodedown)
+                        if temp is not None:
+                            node.near[DOWN] = temp
+                            nodedown = None
+                        else:
+                            self.points.append(nodedown)
+                            node.near[DOWN] = nodedown
+                        break
+                    k+=1
+
+        if (j-1>=0):
+            if (self.grid[i-1][j] != "."):
+                k = i-1
+                while (k>=0):
+                    if (self.grid[k][j] == "+"):
+                        x = Node(k,j)
+                        temp = self.check(x)
+                        if temp is not None:
+                            node.near[UP] = temp
+                            nodeup = None
+                        else:
+                            self.points.append(x)
+                            node.near[UP] = x
+                        self.way4(x)
+                        break
+                    k-=1
+        
+        if (j+1<len(self.grid[0]) and node.near[RIGHT] is None):
+            if (self.grid[i][j+1] != "."):
+                k = j+1
+                while (k<len(self.grid[0])):
+                    if (self.grid[i][k] == "+"):
+                        nodeup = Node(i,k)
+                        temp = self.check(nodeup)
+                        if temp is not None:
+                            node.near[RIGHT] = temp
+                            noderight = None
+                        else:
+                            self.points.append(nodeup)
+                            node.near[RIGHT] = nodeup
+                        break
+                    k+=1
+        if (j-1>=0 and node.near[LEFT] is None):
+            if (self.grid[i][j-1] != "."):
+                k = j-1
+                while (k>=0):
+                    if (self.grid[i][k] == "+"):
+                        nodeleft = Node(i,k)
+                        temp = self.check(nodeleft)
+                        if temp is not None:
+                            node.near[LEFT] = temp
+                            nodeleft = None
+                        else:
+                            self.points.append(nodeleft)
+                            node.near[LEFT] = nodeleft
+                        break
+                    k-=1
+        if (nodedown is not None):
+            self.way4(nodedown)
+        if (nodeup is not None):
+            self.way4(nodeup)
+        if (nodeleft is not None):
+            self.way4(nodeleft)
+        if (noderight is not None):
+            self.way4(noderight)
+
+    def First_Node(self):
+        nodeFound = False
+        for i in range(len(self.grid)):
+            for j in range(len(self.grid[0])):
+                if (self.grid[i][j] == "+"):
+                    return Node(i,j)
+        return None
+    
+    """
     def create_nodes(self):
         A = Node(5, 5)
         B = Node(5, 10)
@@ -45,6 +159,9 @@ class Group_Nodes(object):
         G.near[UP] = E
         G.near[LEFT] = F
         self.points = [A, B, C, D, E, F ,G]
+
+    """
+
     def refresh(self,screen):
         for i in self.points:
             i.draw_near(screen)
