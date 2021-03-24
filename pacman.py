@@ -10,6 +10,7 @@ class Pacman(object):
         self.move = STOP
         self.speed = 100
         self.radius = 10
+        self.touch = 5
         self.nodes = nodes
         self.node = nodes.points[0]
         self.target = self.node
@@ -37,6 +38,20 @@ class Pacman(object):
             d2 = v2.magnitudeSquared()
             return d1>=d2
         return False
+    
+    def portal(self):
+        if (self.node.portalNode):
+            self.node = self.node.portalNode
+            self.recent_position()
+
+    def eatPellets(self, pelletList):
+        for pellet in pelletList:
+            d = self.location - pellet.location
+            d1 = d.magnitudeSquared()
+            r = (pellet.radius+self.touch)**2
+            if d1<= r:
+                return pellet
+        return None
 
     def check_direction(self):
         key = pygame.key.get_pressed()
@@ -61,6 +76,7 @@ class Pacman(object):
         if (self.move is not STOP):
             if (self.pass_target()):
                 self.node = self.target
+                self.portal()
                 if (self.node.near[self.move] is not None):
                     self.target = self.node.near[self.move]
                 else:
@@ -81,6 +97,7 @@ class Pacman(object):
                 self.last = move
             if (self.pass_target()):
                 self.node = self.target
+                self.portal()
                 if (self.node.near[move] is not None):
                     self.target = self.node.near[move]
                     if (self.move != move):

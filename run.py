@@ -3,6 +3,7 @@ from pygame.locals import *
 from constants import *
 from nodes import Group_Nodes
 from pacman import *
+from pellets import PelletGroups
 
 class GameControl(object):
     def __init__(self):
@@ -19,15 +20,23 @@ class GameControl(object):
     #    self.background = pygame.surface.Surface(screen_size).convert()
     #    self.background.fill(black)
 
+    def eat_pellets(self):
+        pellet = self.pacman.eatPellets(self.pellets.pelletList)
+        if (pellet):
+            self.pellets.pelletList.remove(pellet)
+
     def start_game(self):
         #pass
         self.Nodes = Group_Nodes("maze.txt")
+        self.pellets = PelletGroups("mappellets.txt")
         self.pacman = Pacman(self.Nodes)
     
     def update(self):
         t = self.clock.tick(30)/1000
         #self.pacman.update()
         self.pacman.update(t)
+        self.pellets.update(t)
+        self.eat_pellets()
         self.checkEvents()
         self.redraw()
 
@@ -45,6 +54,7 @@ class GameControl(object):
        #     for j in range(game_cols):
         #        pygame.draw.rect(self.screen, blue,(Tile_Width *(j+0.8) , Tile_Height * (i+0.8), 9, 9))
         self.Nodes.refresh(self.screen)
+        self.pellets.draw(self.screen)
         self.pacman.draw(self.screen)
         pygame.display.update()
 

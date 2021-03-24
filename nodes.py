@@ -8,14 +8,15 @@ class Node(object):
         self.column = column    # }
         self.location = Vector2(column * Tile_Width,row * Tile_Height) #App_location
         self.near = {UP:None, DOWN:None, RIGHT:None, LEFT:None} #nearby neighbors
+        self.portalNode = None
 
     def draw_near(self,screen):
         for i in self.near.keys():
             if (self.near[i] is not None):
                 start = (self.location.x,self.location.y) #start point line
                 end = (self.near[i].location.x,self.near[i].location.y) #finish point line
-                pygame.draw.line(screen,white,start,end,4)
-                pygame.draw.circle(screen,red,start,12)
+                pygame.draw.line(screen,blue,start,end,4)
+                #pygame.draw.circle(screen,red,start,12)
 
 class Group_Nodes(object):
     def __init__(self,map):
@@ -33,18 +34,22 @@ class Group_Nodes(object):
     def createNodeList(self,textfile):
         #near = self.First_Node(len(self.grid),len(self.grid[0]))
         #isWall = True
+        portal = []
         self.grid = self.readFile(textfile)
         first = self.First_Node()
-        self.way4(first)
+        self.way4(first,portal)
+        portal[0].portalNode = portal[1]
+        portal[1].portalNode = portal[0]
 
     def check(self, node):
         for inode in self.points:
             if node.row == inode.row and node.column == inode.column:
-                
                 return inode
         return None
 
-    def way4(self,node):
+    def way4(self,node,portal):
+        if (self.grid[node.row][node.column] == "1"):
+            portal.append(node)
         k=0
         nodeleft = None
         noderight = None
@@ -57,7 +62,7 @@ class Group_Nodes(object):
             if (self.grid[i+1][j] != "."):
                 k = i+1
                 while (k<len(self.grid)):
-                    if (self.grid[k][j] == "+"):
+                    if (self.grid[k][j] == "+" or self.grid[k][j] == "1"):
                         nodedown = Node(k,j)
                         temp = self.check(nodedown)
                         if temp is not None:
@@ -73,16 +78,15 @@ class Group_Nodes(object):
             if (self.grid[i-1][j] != "."):
                 k = i-1
                 while (k>=0):
-                    if (self.grid[k][j] == "+"):
-                        x = Node(k,j)
-                        temp = self.check(x)
+                    if (self.grid[k][j] == "+" or self.grid[k][j] == "1"):
+                        nodeup = Node(k,j)
+                        temp = self.check(nodeup)
                         if temp is not None:
                             node.near[UP] = temp
                             nodeup = None
                         else:
-                            self.points.append(x)
-                            node.near[UP] = x
-                        self.way4(x)
+                            self.points.append(nodeup)
+                            node.near[UP] = nodeup
                         break
                     k-=1
         
@@ -90,22 +94,22 @@ class Group_Nodes(object):
             if (self.grid[i][j+1] != "."):
                 k = j+1
                 while (k<len(self.grid[0])):
-                    if (self.grid[i][k] == "+"):
-                        nodeup = Node(i,k)
-                        temp = self.check(nodeup)
+                    if (self.grid[i][k] == "+" or self.grid[i][k] == "1"):
+                        noderight = Node(i,k)
+                        temp = self.check(noderight)
                         if temp is not None:
                             node.near[RIGHT] = temp
                             noderight = None
                         else:
-                            self.points.append(nodeup)
-                            node.near[RIGHT] = nodeup
+                            self.points.append(noderight)
+                            node.near[RIGHT] = noderight
                         break
                     k+=1
         if (j-1>=0 and node.near[LEFT] is None):
             if (self.grid[i][j-1] != "."):
                 k = j-1
                 while (k>=0):
-                    if (self.grid[i][k] == "+"):
+                    if (self.grid[i][k] == "+" or self.grid[i][k] == "1"):
                         nodeleft = Node(i,k)
                         temp = self.check(nodeleft)
                         if temp is not None:
@@ -117,13 +121,13 @@ class Group_Nodes(object):
                         break
                     k-=1
         if (nodedown is not None):
-            self.way4(nodedown)
+            self.way4(nodedown,portal)
         if (nodeup is not None):
-            self.way4(nodeup)
+            self.way4(nodeup,portal)
         if (nodeleft is not None):
-            self.way4(nodeleft)
+            self.way4(nodeleft,portal)
         if (noderight is not None):
-            self.way4(noderight)
+            self.way4(noderight,portal)
 
     def First_Node(self):
         nodeFound = False
