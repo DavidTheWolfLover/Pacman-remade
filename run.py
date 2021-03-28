@@ -41,7 +41,7 @@ class GameControl(object):
         t = self.clock.tick(30)/1000
         #self.pacman.update()
         self.pacman.update(t)
-        self.ghost.update(t)
+        self.ghost.update(t,self.pacman)
         self.pellets.update(t)
         self.eat_pellets()
         if (self.pacman.Ghosteat(self.ghost) == True):

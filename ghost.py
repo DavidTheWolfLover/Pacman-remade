@@ -4,6 +4,7 @@ from pygame.locals import *
 from vector import Vector2
 from constants import *
 from random import randint
+from mode import Mode
 
 class Ghost(object):
     def __init__(self,nodes): #DONE
@@ -14,18 +15,41 @@ class Ghost(object):
         self.radius = 10
         self.touch = 5
         self.points = 200
+
         self.nodes = nodes
         self.node = nodes.points[10]
+
         self.target = self.node
         self.recent_position()
         self.goal = Vector2()
         self.visible = True
 
+        self.modetime = 0
+        self.modeCount = 0
+        self.mode = [Mode(name="SCATTER", time=7), Mode(name="CHASE", time=20), \
+                     Mode(name="SCATTER", time=7), Mode(name="CHASE", time=20), \
+                     Mode(name="SCATTER", time=5), Mode(name="CHASE", time=20), \
+                     Mode(name="SCATTER", time=5), Mode(name="CHASE")]
+
     def recent_position(self): #DONE
         self.location = self.node.location.copy()
 
-    def update(self,t): #DONE
-        self.location += self.move*self.speed*t
+    def updateMode(self,t):
+        self.modetime += t
+        if (self.mode[self.modeCount].time is not None):
+            if self.modetime >= self.mode[self.modeCount].time:
+                self.reverse()
+                self.modetime = 0
+                self.modeCount += 1
+
+    def update(self,t,pacman): #DONE
+        speed = self.speed * self.mode[self.modeCount].speedMult
+        self.location += self.move*speed*t
+        self.updateMode(t)
+        if (self.mode[self.modeCount].name == "SCATTER"):
+            self.goal = Vector2(screen_size[0], 0) #Blinky goes on the top right of the map
+        elif (self.mode[self.modeCount].name == "CHASE"): 
+            self.goal = pacman.location
         self.move_self()
 
     def pass_target(self): #DONE
