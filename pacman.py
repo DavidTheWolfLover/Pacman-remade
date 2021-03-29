@@ -76,10 +76,11 @@ class Pacman(object):
         if (self.last is not STOP and self.pass_target()):
             self.node = self.target
             if (self.node.near[self.last] is not None):
-                self.target = self.node.near[self.last]
-                self.recent_position()
-                self.move = self.last
-                self.last = STOP
+                if self.node.entrance == False:
+                    self.target = self.node.near[self.last]
+                    self.recent_position()
+                    self.move = self.last
+                    self.last = STOP
         if (self.move is not STOP):
             if (self.pass_target()):
                 self.node = self.target
@@ -106,10 +107,17 @@ class Pacman(object):
                 self.node = self.target
                 self.portal()
                 if (self.node.near[move] is not None):
-                    self.target = self.node.near[move]
-                    if (self.move != move):
-                        self.recent_position()
-                        self.move = move
+                    if self.node.entrance:
+                        if (self.node.near[self.move] is not None):
+                            self.target = self.node.near[self.move]
+                        else:
+                            self.recent_position()
+                            self.move = STOP
+                    else:
+                        self.target = self.node.near[move]
+                        if (self.move != move):
+                            self.recent_position()
+                            self.move = move
                 elif (self.node.near[self.move] is not None):
                     self.target = self.node.near[self.move]
                 else:
