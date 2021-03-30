@@ -18,7 +18,7 @@ class Node(object):
                 start = (self.location.x,self.location.y) #start point line
                 end = (self.near[i].location.x,self.near[i].location.y) #finish point line
                 pygame.draw.line(screen,blue,start,end,4)
-                pygame.draw.circle(screen,red,start,12)
+                #pygame.draw.circle(screen,red,start,12)
 
 class Group_Nodes(object):
     def __init__(self,map):

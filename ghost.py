@@ -24,32 +24,64 @@ class Ghost(object):
         self.goal = Vector2()
         self.visible = True
 
-        self.modetime = 0
+        self.modetime = 0 #time for a mode counting...
         self.modeCount = 0
-        self.mode = [Mode(name="SCATTER", time=7), Mode(name="CHASE", time=20), \
+        self.mode = [Mode(name="SCATTER", time=7), Mode(name="CHASE"), \
                      Mode(name="SCATTER", time=7), Mode(name="CHASE", time=20), \
                      Mode(name="SCATTER", time=5), Mode(name="CHASE", time=20), \
                      Mode(name="SCATTER", time=5), Mode(name="CHASE")]
+        """self.reset = [Mode(name="SCATTER", time=7), Mode(name="CHASE", time=20), 
+                      Mode(name="SCATTER", time=7), Mode(name="CHASE", time=20), 
+                      Mode(name="SCATTER", time=5), Mode(name="CHASE", time=20), 
+                      Mode(name="SCATTER", time=5), Mode(name="CHASE")]"""#reset the self.mode because it can be modified by frightened mode
+                                                                          #I just put here in case I need it XD
 
     def recent_position(self): #DONE
         self.location = self.node.location.copy()
 
     def updateMode(self,t):
         self.modetime += t
+        print(self.modetime,' ',self.mode[self.modeCount].name,end='\n')
         if (self.mode[self.modeCount].time is not None):
             if self.modetime >= self.mode[self.modeCount].time:
                 self.reverse()
                 self.modetime = 0
                 self.modeCount += 1
 
-    def update(self,t,pacman): #DONE
+    def scatter(self):
+        self.goal = Vector2(screen_size[0], 0)
+
+    def chase(self, pacman, blinky = None):
+        self.goal = pacman.location
+    
+    def fright(self):
+        if self.mode[self.modeCount].name != "SPAWN":
+            if self.mode[self.modeCount].name != "FREIGHT":
+                if self.mode[self.modeCount].time is not None:
+                    temp = self.mode[self.modeCount].time - self.modetime
+                    self.mode[self.modeCount].time = temp
+                self.mode.insert(self.modeCount,Mode("FREIGHT", time=7, speedMult=0.5))
+                self.modetime = 0
+            else:
+                self.modetime = 0
+            self.reverse()
+            
+    def randomgoal(self):
+        x = randint(0,screen_width) #random horizontal
+        y = randint(0,screen_height) #random vertical
+        self.goal = Vector2(x,y)
+        
+
+    def update(self, t, pacman, blinky = None): #DONE
         speed = self.speed * self.mode[self.modeCount].speedMult
         self.location += self.move*speed*t
         self.updateMode(t)
         if (self.mode[self.modeCount].name == "SCATTER"):
-            self.goal = Vector2(screen_size[0], 0) #Blinky goes on the top right of the map
+            self.scatter() #Blinky goes on the top right of the map
         elif (self.mode[self.modeCount].name == "CHASE"): 
-            self.goal = pacman.location
+            self.chase(pacman,blinky) #time to chase pacman :D
+        elif (self.mode[self.modeCount].name == "FREIGHT"):
+            self.randomgoal()
         self.move_self()
 
     def pass_target(self): #DONE
@@ -69,10 +101,11 @@ class Ghost(object):
     def check_direction(self):
         directions = []
         for key in self.node.near.keys():
-            if self.node.near[key] is not None and key != self.move * -1 :
-                directions.append(key)
+            if self.node.near[key] is not None:
+                if key != self.move * -1 :
+                    directions.append(key)
         if (len(directions) == 0):
-            directions.append(self.move * -1)
+            directions.append(self.ReturnNode())
         return directions
 
     def shortest_way(self,direction):
