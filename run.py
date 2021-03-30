@@ -13,6 +13,7 @@ class GameControl(object):
         self.background = None
         #self.Fill_Back()
         pygame.display.set_caption('Pacman Remake')
+        pygame.display.set_icon(icon) 
         self.clock = pygame.time.Clock()
         #pygame.mixer.music.load('Pac-man theme.mp3')
         #pygame.mixer.music.set_volume(0.25)
@@ -32,6 +33,13 @@ class GameControl(object):
             self.pellets.pelletList.remove(pellet)
             if pellet.name == "powerpellet":
                 self.ghost.fright()
+    
+    def eat_ghost(self):
+        if self.pacman.Ghosteat(self.ghost):
+            if self.ghost.mode[self.ghost.modeCount].name == "FREIGHT":
+                self.ghost.spawnMode(speed=2)
+            elif self.ghost.mode[self.ghost.modeCount].name != "SPAWN":
+                quit()
 
     def start_game(self):
         #pass
@@ -47,8 +55,7 @@ class GameControl(object):
         self.ghost.update(t,self.pacman)
         self.pellets.update(t)
         self.eat_pellets()
-        if (self.pacman.Ghosteat(self.ghost) == True):
-            exit()
+        self.eat_ghost()
         self.checkEvents()
         self.redraw()
 

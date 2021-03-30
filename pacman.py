@@ -56,7 +56,7 @@ class Pacman(object):
         d = self.location - ghost.location
         d1 = d.magnitudeSquared()
         r = (ghost.radius+self.touch)**2
-        if d1< r:
+        if d1 <= r:
             return True
         return False
 

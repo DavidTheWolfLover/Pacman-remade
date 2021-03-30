@@ -11,6 +11,7 @@ class Node(object):
         self.portalNode = None
         self.homeguide = False
         self.entrance = False
+        self.spawnghost = False
 
     def draw_near(self,screen):
         for i in self.near.keys():
@@ -59,6 +60,8 @@ class Group_Nodes(object):
             portal.append(node)
         elif (grid[node.row][node.column] == "H"):
             node.homeguide = True
+        elif (grid[node.row][node.column] == "S"):
+            node.spawnghost = True
         k=0
         nodeleft = None
         noderight = None
@@ -71,7 +74,7 @@ class Group_Nodes(object):
             if (grid[i+1][j] != "."):
                 k = i+1
                 while (k<len(grid)):
-                    if (grid[k][j] == "+" or grid[k][j] == "1" or grid[k][j] == "H"):
+                    if (grid[k][j] == "+" or grid[k][j] == "1" or grid[k][j] == "H" or grid[k][j]== "S"):
                         nodedown = Node(k,j)
                         temp = self.check(nodedown,points)
                         if temp is not None:
@@ -87,7 +90,7 @@ class Group_Nodes(object):
             if (grid[i-1][j] != "."):
                 k = i-1
                 while (k>=0):
-                    if (grid[k][j] == "+" or grid[k][j] == "1" or grid[k][j] == "H"):
+                    if (grid[k][j] == "+" or grid[k][j] == "1" or grid[k][j] == "H" or grid[k][j]== "S"):
                         nodeup = Node(k,j)
                         temp = self.check(nodeup,points)
                         if temp is not None:
@@ -103,7 +106,7 @@ class Group_Nodes(object):
             if (grid[i][j+1] != "."):
                 k = j+1
                 while (k<len(grid[0])):
-                    if (grid[i][k] == "+" or grid[i][k] == "1" or grid[i][k] == "H"):
+                    if (grid[i][k] == "+" or grid[i][k] == "1" or grid[i][k] == "H" or grid[i][k]== "S"):
                         noderight = Node(i,k)
                         temp = self.check(noderight,points)
                         if temp is not None:
@@ -118,7 +121,7 @@ class Group_Nodes(object):
             if (grid[i][j-1] != "."):
                 k = j-1
                 while (k>=0):
-                    if (grid[i][k] == "+" or grid[i][k] == "1" or grid[i][k]== "H"):
+                    if (grid[i][k] == "+" or grid[i][k] == "1" or grid[i][k]== "H" or grid[i][k]== "S"):
                         nodeleft = Node(i,k)
                         temp = self.check(nodeleft,points)
                         if temp is not None:
@@ -173,7 +176,7 @@ class Group_Nodes(object):
         return [['.', '.', '+', '.', '.'],
                 ['.', '.', '|', '.', '.'],
                 ['+', '.', '|', '.', '+'],
-                ['+', '-', '+', '-', '+'],
+                ['+', '-', 'S', '-', '+'],
                 ['+', '.', '.', '.', '+']]
 
     def refresh(self,screen):

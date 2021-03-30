@@ -35,6 +35,7 @@ class Ghost(object):
                       Mode(name="SCATTER", time=5), Mode(name="CHASE", time=20), 
                       Mode(name="SCATTER", time=5), Mode(name="CHASE")]"""#reset the self.mode because it can be modified by frightened mode
                                                                           #I just put here in case I need it XD
+        self.spawnnode = self.findSNode()
 
     def recent_position(self): #DONE
         self.location = self.node.location.copy()
@@ -70,7 +71,20 @@ class Ghost(object):
         x = randint(0,screen_width) #random horizontal
         y = randint(0,screen_height) #random vertical
         self.goal = Vector2(x,y)
-        
+
+    def spawnMode(self, speed=1):
+        self.mode.pop(self.modeCount)
+        self.mode.insert(self.modeCount,Mode("SPAWN", speedMult=speed))
+        self.modeTimer = 0
+
+    def findSNode(self):
+        for node in self.nodes.points:
+            if node.spawnghost:
+                break
+        return node
+
+    def spawn(self):
+        self.goal = self.spawnnode.location
 
     def update(self, t, pacman, blinky = None): #DONE
         speed = self.speed * self.mode[self.modeCount].speedMult
@@ -82,6 +96,8 @@ class Ghost(object):
             self.chase(pacman,blinky) #time to chase pacman :D
         elif (self.mode[self.modeCount].name == "FREIGHT"):
             self.randomgoal()
+        elif (self.mode[self.modeCount].name == "SPAWN"):
+            self.spawn()
         self.move_self()
 
     def pass_target(self): #DONE
@@ -126,6 +142,10 @@ class Ghost(object):
             self.move = self.shortest_way(direction)
             self.target = self.node.near[self.move]
             self.recent_position()
+            if self.mode[self.modeCount].name == "SPAWN":
+                if self.location == self.goal:
+                    self.mode.pop(self.modeCount)
+
 
     def ReturnNode(self):
         if (self.move * -1 == UP):

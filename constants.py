@@ -25,6 +25,8 @@ pacl = pygame.image.load(r'C:\Users\kitty\Desktop\Pacman\Pacman-Remake\Pacman-re
 pacu = pygame.image.load(r'C:\Users\kitty\Desktop\Pacman\Pacman-Remake\Pacman-remake-sprites\pacup.png')
 pacd = pygame.image.load(r'C:\Users\kitty\Desktop\Pacman\Pacman-Remake\Pacman-remake-sprites\pacdown.png')
 
+icon = pygame.image.load(r'C:\Users\kitty\Desktop\Pacman\Pacman-Remake\Pacman-remake-sprites\pacright.png')
+
 ghost1 = pygame.image.load(r'C:\Users\kitty\Desktop\Pacman\Pacman-Remake\Pacman-remake-sprites\smallghosttest.png')
 
 
