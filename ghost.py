@@ -5,25 +5,19 @@ from vector import Vector2
 from constants import *
 from random import randint
 from mode import Mode
+from base import Base
 
-class Ghost(object):
+class Ghost(Base):
     def __init__(self,nodes): #DONE
+        Base.__init__(self,nodes)
         self.name = "Ghost"
-        self.move = STOP
-        self.color = white
-        self.speed = 100
-        self.radius = 10
-        self.touch = 5
         self.points = 200
 
-        self.nodes = nodes
+        self.goal = Vector2()
         self.node = nodes.points[10]
-
         self.target = self.node
         self.recent_position()
-        self.goal = Vector2()
-        self.visible = True
-
+        
         self.modetime = 0 #time for a mode counting...
         self.modeCount = 0
         self.mode = [Mode(name="SCATTER", time=7), Mode(name="CHASE", time=20), \
@@ -36,9 +30,6 @@ class Ghost(object):
                       Mode(name="SCATTER", time=5), Mode(name="CHASE")]"""#reset the self.mode because it can be modified by frightened mode
                                                                           #I just put here in case I need it XD
         self.spawnnode = self.findSNode()
-
-    def recent_position(self): #DONE
-        self.location = self.node.location.copy()
 
     def updateMode(self,t):
         self.modetime += t
@@ -100,20 +91,6 @@ class Ghost(object):
             self.spawn()
         self.move_self()
 
-    def pass_target(self): #DONE
-        if self.target is not None:
-            v1 =  self.location - self.node.location
-            v2 = self.target.location - self.node.location
-            d1 = v1.magnitudeSquared()
-            d2 = v2.magnitudeSquared()
-            return d1>=d2
-        return False
-    
-    def portal(self): #DONE
-        if (self.node.portalNode):
-            self.node = self.node.portalNode
-            self.recent_position()
-
     def check_direction(self):
         directions = []
         for key in self.node.near.keys():
@@ -156,17 +133,6 @@ class Ghost(object):
             return LEFT
         elif (self.move * -1 == RIGHT):
             return RIGHT
-        
-    def reverse(self): #DONE
-        if (self.move is UP):
-            self.move = DOWN
-        elif (self.move is DOWN):
-            self.move = UP
-        elif (self.move is LEFT):
-            self.move = RIGHT
-        elif (self.move is RIGHT):
-            self.move = LEFT
-        self.target, self.node = self.node, self.target
 
     def draw(self,screen): #DONE
         if self.visible:
