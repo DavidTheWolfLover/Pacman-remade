@@ -26,7 +26,7 @@ class Ghost(object):
 
         self.modetime = 0 #time for a mode counting...
         self.modeCount = 0
-        self.mode = [Mode(name="SCATTER", time=7), Mode(name="CHASE"), \
+        self.mode = [Mode(name="SCATTER", time=7), Mode(name="CHASE", time=20), \
                      Mode(name="SCATTER", time=7), Mode(name="CHASE", time=20), \
                      Mode(name="SCATTER", time=5), Mode(name="CHASE", time=20), \
                      Mode(name="SCATTER", time=5), Mode(name="CHASE")]

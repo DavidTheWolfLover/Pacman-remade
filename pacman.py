@@ -3,23 +3,14 @@ import math
 from pygame.locals import *
 from vector import Vector2
 from constants import *
+from base import Base
 
-class Pacman(object):
+class Pacman(Base):
     def __init__(self,nodes):
+        Base.__init__(self,nodes)
         self.name = "Pacman"
-        self.move = STOP
-        self.speed = 100
-        self.radius = 10
-        self.touch = 5
-        self.nodes = nodes
-        self.node = nodes.points[0]
-        self.target = self.node
         self.prev =  pacr
-        self.recent_position()
         self.last = STOP
-
-    def recent_position(self):
-        self.location = self.node.location.copy()
 
     def update(self,t):
         self.location += self.move*self.speed*t
@@ -28,20 +19,6 @@ class Pacman(object):
             self.move_key(move)
         else:
             self.move_self()
-
-    def pass_target(self):
-        if self.target is not None:
-            v1 =  self.location - self.node.location
-            v2 = self.target.location - self.node.location
-            d1 = v1.magnitudeSquared()
-            d2 = v2.magnitudeSquared()
-            return d1>=d2
-        return False
-    
-    def portal(self):
-        if (self.node.portalNode):
-            self.node = self.node.portalNode
-            self.recent_position()
 
     def eatPellets(self, pelletList):
         for pellet in pelletList:
@@ -123,17 +100,6 @@ class Pacman(object):
                 else:
                     self.recent_position()
                     self.move = STOP
-
-    def reverse(self):
-        if (self.move is UP):
-            self.move = DOWN
-        elif (self.move is DOWN):
-            self.move = UP
-        elif (self.move is LEFT):
-            self.move = RIGHT
-        elif (self.move is RIGHT):
-            self.move = LEFT
-        self.target, self.node = self.node, self.target
         
     def draw(self,screen):
         l = (self.location.x-10,self.location.y-10)
