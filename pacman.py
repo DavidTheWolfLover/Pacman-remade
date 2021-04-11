@@ -29,13 +29,14 @@ class Pacman(Base):
                 return pellet
         return None
 
-    def Ghosteat(self,ghost):
-        d = self.location - ghost.location
-        d1 = d.magnitudeSquared()
-        r = (ghost.radius+self.touch)**2
-        if d1 <= r:
-            return True
-        return False
+    def Ghosteat(self,ghosts):
+        for ghost in ghosts.ghosts:
+            d = self.location - ghost.location
+            d1 = d.magnitudeSquared()
+            r = (ghost.radius+self.touch)**2
+            if d1 <= r:
+                return ghost
+        return None
 
     def check_direction(self):
         key = pygame.key.get_pressed()

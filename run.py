@@ -4,7 +4,7 @@ from constants import *
 from nodes import Group_Nodes
 from pacman import *
 from pellets import PelletGroups
-from ghost import Ghost
+from ghost import Group_Ghosts
 
 class GameControl(object):
     def __init__(self):
@@ -32,13 +32,14 @@ class GameControl(object):
         if (pellet):
             self.pellets.pelletList.remove(pellet)
             if pellet.name == "powerpellet":
-                self.ghost.fright()
+                self.ghosts.fright()
     
     def eat_ghost(self):
-        if self.pacman.Ghosteat(self.ghost):
-            if self.ghost.mode[self.ghost.modeCount].name == "FREIGHT":
-                self.ghost.spawnMode(speed=2)
-            elif self.ghost.mode[self.ghost.modeCount].name != "SPAWN":
+        ghost = self.pacman.Ghosteat(self.ghosts)
+        if ghost is not None:
+            if ghost.mode[ghost.modeCount].name == "FRIGHT":
+                ghost.spawnMode(speed=2)
+            elif ghost.mode[ghost.modeCount].name != "SPAWN":
                 quit()
 
     def start_game(self):
@@ -46,18 +47,18 @@ class GameControl(object):
         self.Nodes = Group_Nodes("maze.txt")
         self.pellets = PelletGroups("mappellets.txt")
         self.pacman = Pacman(self.Nodes)
-        self.ghost = Ghost(self.Nodes)
+        self.ghosts = Group_Ghosts(self.Nodes)
     
     def update(self):
         t = self.clock.tick(60)/1000
         #self.pacman.update()
         self.pacman.update(t)
-        self.ghost.update(t,self.pacman)
+        self.ghosts.update(t,self.pacman)
         self.pellets.update(t)
         self.eat_pellets()
         self.eat_ghost()
         self.checkEvents()
-        self.redraw()
+        self.redraw(t)
 
     def checkEvents(self):
         for event in pygame.event.get():
@@ -67,7 +68,7 @@ class GameControl(object):
             #elif event.type == KEYUP:
             #    self.pacman.pressed = False
                 
-    def redraw(self):
+    def redraw(self,t):
         self.screen.fill(black)
         #for i in range(game_rows):
        #     for j in range(game_cols):
@@ -75,7 +76,7 @@ class GameControl(object):
         self.Nodes.refresh(self.screen)
         self.pellets.draw(self.screen)
         self.pacman.draw(self.screen)
-        self.ghost.draw(self.screen)
+        self.ghosts.draw(self.screen,t)
         pygame.display.update()
 
 

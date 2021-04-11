@@ -9,9 +9,9 @@ class Node(object):
         self.location = Vector2(column * Tile_Width,row * Tile_Height) #App_location
         self.near = {UP:None, DOWN:None, RIGHT:None, LEFT:None} #nearby neighbors
         self.portalNode = None
-        self.homeguide = False
-        self.entrance = False
-        self.spawnghost = False
+        self.homeguide = False #help draw the node
+        self.entrance = False #entrance to home
+        self.spawnghost = False #point in house
 
     def draw_near(self,screen):
         for i in self.near.keys():
