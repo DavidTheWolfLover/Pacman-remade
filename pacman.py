@@ -11,6 +11,7 @@ class Pacman(Base):
         self.name = "Pacman"
         self.prev =  pacr
         self.last = STOP
+        self.initial_location()
 
     def update(self,t):
         self.location += self.move*self.speed*t
@@ -19,6 +20,15 @@ class Pacman(Base):
             self.move_key(move)
         else:
             self.move_self()
+
+    def initial_location(self):
+        self.move = LEFT
+        for node in self.nodes.points:
+            if node.pacmanloc == True:
+                self.node = node
+                self.target = self.node.near[self.move]
+                self.recent_position()
+                self.location.x -= (self.node.location.x - self.target.location.x)/2
 
     def eatPellets(self, pelletList):
         for pellet in pelletList:
@@ -29,7 +39,7 @@ class Pacman(Base):
                 return pellet
         return None
 
-    def Ghosteat(self,ghosts):
+    def Ghosteat(self, ghosts):
         for ghost in ghosts.ghosts:
             d = self.location - ghost.location
             d1 = d.magnitudeSquared()
@@ -38,6 +48,14 @@ class Pacman(Base):
                 return ghost
         return None
 
+    def eatFruit(self, fruit):
+        d = self.location - fruit.location
+        d1 = d.magnitudeSquared()
+        r = (fruit.radius+self.touch)**2
+        if d1 <= r:
+            return fruit
+        return None
+    
     def check_direction(self):
         key = pygame.key.get_pressed()
         if (key[K_UP] == True):

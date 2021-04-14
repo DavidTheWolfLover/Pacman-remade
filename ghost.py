@@ -20,6 +20,13 @@ class Ghost(Base):
         self.recent_position()
         self.ID = -1
 
+        self.release_pellet = 0
+        self.block = []
+        self.out = False
+        self.draw_release = False #Draw normally because usually spawn means frightened sprite
+
+        self.guide = [UP]
+
         self.modetime = 0 #time for a mode counting...
         self.modeCount = 0
         self.mode = [Mode(name="SCATTER", time=7), Mode(name="CHASE", time=20), \
@@ -32,7 +39,6 @@ class Ghost(Base):
                       Mode(name="SCATTER", time=5), Mode(name="CHASE")]"""#reset the self.mode because it can be modified by frightened mode
                                                                           #I just put here in case I need it XD
         self.spawnnode = self.findSNode()
-        self.guideBack()
 
     def updateMode(self,t):
         self.modetime += t
@@ -47,7 +53,7 @@ class Ghost(Base):
     def scatter(self):
         self.goal = Vector2(screen_size[0], 0)
 
-    def chase(self, pacman, blinky = None):
+    def chase(self, pacman, red = None):
         self.goal = pacman.location
     
     def fright(self):
@@ -83,17 +89,14 @@ class Ghost(Base):
     def spawn(self):
         self.goal = self.spawnnode.location
 
-    def guideBack(self): #Let ghost go out of home :D
-        self.guide = [UP]
-
-    def update(self, t, pacman, blinky = None): #DONE
+    def update(self, t, pacman, red = None): #DONE
         speed = self.speed * self.mode[self.modeCount].speedMult
         self.location += self.move*speed*t
         self.updateMode(t)
         if (self.mode[self.modeCount].name == "SCATTER"):
-            self.scatter() #Blinky goes on the top right of the map
+            self.scatter() #Red goes on the top right of the map
         elif (self.mode[self.modeCount].name == "CHASE"): 
-            self.chase(pacman,blinky) #time to chase pacman :D
+            self.chase(pacman,red) #time to chase pacman :D
         elif (self.mode[self.modeCount].name == "FRIGHT"):
             self.randomgoal() #scary
         elif (self.mode[self.modeCount].name == "SPAWN"): #time to go home
@@ -107,7 +110,8 @@ class Ghost(Base):
                 if key != self.move * -1 :
                     if not self.mode[self.modeCount].name == "SPAWN":
                         if not self.node.entrance:
-                            directions.append(key)
+                            if key not in self.block:
+                                directions.append(key)
                         else:
                             if (key != DOWN):
                                 directions.append(key)
@@ -138,6 +142,8 @@ class Ghost(Base):
             if self.mode[self.modeCount].name == "SPAWN":
                 if self.location == self.goal:
                     self.mode.pop(self.modeCount)
+                    if self.draw_release == True:
+                        self.draw_release = False
                     self.move =self.mode[self.modeCount].direction
                     self.target = self.node.near[self.move]
                     self.recent_position()
@@ -168,7 +174,7 @@ class Ghost(Base):
             #p = (self.location.x,self.location.y)
             p = (self.location.x - 10, self.location.y - 13)
             ghost = self.prev
-            if (self.mode[self.modeCount].name != "FRIGHT" and self.mode[self.modeCount].name != "SPAWN"):
+            if (self.mode[self.modeCount].name != "FRIGHT" and self.mode[self.modeCount].name != "SPAWN") or (self.draw_release == True):
                 if self.move is UP:
                     ghost = ghostu[self.ID]
                 if self.move is DOWN:
@@ -184,48 +190,90 @@ class Ghost(Base):
             screen.blit(ghost, p)
             #pygame.draw.circle(screen, self.color, p, self.radius)
 
-class Blinky(Ghost):
+class Red(Ghost):
     def __init__(self,nodes):
         Ghost.__init__(self,nodes)
-        self.name = "Blinky"
+        self.name = "Red"
         self.ID = 0
+        self.initial_location()
+        self.out = True
+    
+    def initial_location(self):
+        for node in self.nodes.points:
+            if node.redloc == True:
+                self.node = node
+                self.target = self.node
+                self.recent_position()
 
-class Pinky(Ghost):
+class Blue(Ghost):
     def __init__(self, nodes):
         Ghost.__init__(self, nodes)
-        self.name = "Pinky"
+        self.name = "Blue"
         self.ID = 1
+        self.initial_location()
+        self.out = True
+
+    def initial_location(self):
+        for node in self.nodes.points:
+            if node.blueloc == True:
+                self.node = node
+                self.target = self.node
+                self.recent_position()
 
     def scatter(self):
         self.goal = Vector2()
 
-    def chase(self, pacman, blinky=None):
+    def chase(self, pacman, red=None):
         self.goal = pacman.location + pacman.move * Tile_Width * 4
 
-class Inky(Ghost):
+class Green(Ghost):
     def __init__(self,nodes):
         Ghost.__init__(self,nodes)
-        self.name = "Inky"
+        self.name = "Green"
         self.ID = 2
+        self.initial_location()
+        self.release_pellet = 30
+        self.block = [RIGHT]
+        self.spawnnode = self.node
+        self.guide = [UP,RIGHT]
+
+    def initial_location(self):
+        for node in self.nodes.points:
+            if node.greenloc == True:
+                self.node = node
+                self.target = self.node
+                self.recent_position()
     
     def scatter(self):
         self.goal = Vector2(Tile_Width * game_cols, Tile_Height * game_rows)
 
-    def chase(self, pacman, blinky=None):
+    def chase(self, pacman, red=None):
         v = pacman.location + pacman.move * Tile_Width * 2
-        v1 = (v - blinky.location)*2
-        self.goal = v1 + blinky.location
+        v1 = (v - red.location)*2
+        self.goal = v1 + red.location
     
-class Clyde(Ghost):
+class Purple(Ghost):
     def __init__(self,nodes):
         Ghost.__init__(self,nodes)
-        self.name = "Clyde"
+        self.name = "Purple"
         self.ID = 3
+        self.initial_location()
+        self.release_pellet = 60
+        self.block = [LEFT]
+        self.spawnnode = self.node
+        self.guide = [UP,LEFT]
     
+    def initial_location(self):
+        for node in self.nodes.points:
+            if node.purpleloc == True:
+                self.node = node
+                self.target = self.node
+                self.recent_position()
+
     def scatter(self):
         self.goal = Vector2(0, Tile_Height * game_rows)
 
-    def chase(self, pacman, blinky=None):
+    def chase(self, pacman, red=None):
         d = pacman.location - self.location
         d1 = d.magnitudeSquared()
         if d1 <= (Tile_Width * 8)**2:
@@ -236,7 +284,16 @@ class Clyde(Ghost):
 class Group_Ghosts(object):
     def __init__(self,nodes):
         self.nodes = nodes
-        self.ghosts = [Blinky(nodes), Pinky(nodes), Inky(nodes), Clyde(nodes)]
+        #self.ghosts = [Red(nodes), Blue(nodes), Green(nodes), Purple(nodes)]
+        self.ghosts = [Red(nodes)]
+
+    def check_release(self,number):
+        for ghost in self.ghosts:
+            if (ghost.release_pellet <= number and ghost.out == False):
+                ghost.draw_release = True
+                ghost.out = True
+                ghost.block = []
+                ghost.spawnMode()
     
     def update(self,t,pacman):
         for ghost in self.ghosts:

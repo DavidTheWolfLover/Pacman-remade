@@ -13,11 +13,12 @@ black = (0, 0, 0)
 white = (255, 255, 255)
 red = (255, 0, 0)
 green = (0, 255, 0)
-blue = (0,0,255)
-yellow = (255,255,0)
-pink = (255,100,150)
-teal = (100,255,255)
-orange = (230,190,40)
+blue = (0, 0, 255)
+yellow = (255, 255, 0)
+pink = (255, 100, 150)
+teal = (100, 255, 255)
+orange = (230, 190, 40)
+matcha = (0, 255, 170)
 
 UP = Vector2(0,-1)
 DOWN = Vector2(0,1)
@@ -59,6 +60,9 @@ ghostd = [rd,bd,gd,pd]
 
 ghosttarget = pygame.image.load(os.path.join("assets","targetghostsmall.png"))
 ghosttargetr = pygame.image.load(os.path.join("assets","targetghostrevertsmall.png"))
+
+#fruit = pygame.image.load(os.path.join("assets","cherrybonussmall.png"))
+fruit = pygame.image.load(os.path.join("assets","cherrybonus-1.png"))
 
 
 

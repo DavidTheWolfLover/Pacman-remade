@@ -5,6 +5,7 @@ from nodes import Group_Nodes
 from pacman import *
 from pellets import PelletGroups
 from ghost import Group_Ghosts
+from fruit import Fruit
 
 class GameControl(object):
     def __init__(self):
@@ -15,11 +16,14 @@ class GameControl(object):
         pygame.display.set_caption('Pacman Remake')
         pygame.display.set_icon(icon) 
         self.clock = pygame.time.Clock()
-        #pygame.mixer.music.load('Pac-man theme.mp3')
+        pygame.mixer.music.load('Pac-man theme 1.mp3')
         #pygame.mixer.music.set_volume(0.25)
-        #pygame.mixer.music.play(-1, 0.0)
+        pygame.mixer.music.play(-1, 0.0)
 
+        self.pellet_count=0
+        self.fruit = None
 
+        self.pause = False
         #self.pac = pygame.transform.scale(pacr, (20, 22))
         #self.clock.tick(30)
 
@@ -30,6 +34,9 @@ class GameControl(object):
     def eat_pellets(self):
         pellet = self.pacman.eatPellets(self.pellets.pelletList)
         if (pellet):
+            self.pellet_count += 1
+            if (self.pellet_count == 50 or self.pellet_count == 140) and self.fruit is None:
+                self.fruit = Fruit(self.Nodes)
             self.pellets.pelletList.remove(pellet)
             if pellet.name == "powerpellet":
                 self.ghosts.fright()
@@ -51,20 +58,33 @@ class GameControl(object):
     
     def update(self):
         t = self.clock.tick(60)/1000
-        #self.pacman.update()
-        self.pacman.update(t)
-        self.ghosts.update(t,self.pacman)
+        if self.pause == False:
+            if self.fruit is not None:
+                self.fruit.update(t)
+            #self.pacman.update()
+            self.pacman.update(t)
+            self.ghosts.update(t,self.pacman)
+            self.eat_pellets()
+            self.ghosts.check_release(self.pellet_count)
+            self.check_fruit()
+            self.eat_ghost()
         self.pellets.update(t)
-        self.eat_pellets()
-        self.eat_ghost()
         self.checkEvents()
         self.redraw(t)
+
+    def check_fruit(self):
+        if self.fruit is not None:
+            if self.fruit.disappear == True or self.pacman.eatFruit(self.fruit) is not None:
+                self.fruit = None
 
     def checkEvents(self):
         for event in pygame.event.get():
             if event.type == QUIT:
                 pygame.quit()
                 exit()
+            elif event.type == KEYDOWN:
+                if event.key == K_SPACE:
+                    self.pause = not self.pause
             #elif event.type == KEYUP:
             #    self.pacman.pressed = False
                 
@@ -75,6 +95,8 @@ class GameControl(object):
         #        pygame.draw.rect(self.screen, blue,(Tile_Width *(j+0.8) , Tile_Height * (i+0.8), 9, 9))
         self.Nodes.refresh(self.screen)
         self.pellets.draw(self.screen)
+        if self.fruit is not None:
+            self.fruit.draw(self.screen)
         self.pacman.draw(self.screen)
         self.ghosts.draw(self.screen,t)
         pygame.display.update()
