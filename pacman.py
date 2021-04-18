@@ -3,25 +3,19 @@ import math
 from pygame.locals import *
 from vector import Vector2
 from constants import *
+from base import Base
 
-class Pacman(object):
+class Pacman(Base):
     def __init__(self,nodes):
+        Base.__init__(self,nodes)
         self.name = "Pacman"
-        self.move = STOP
-        self.speed = 100
-        self.radius = 10
-        self.touch = 5
-        self.nodes = nodes
-        self.node = nodes.points[0]
-        self.target = self.node
         self.prev =  pacr
-        self.recent_position()
         self.last = STOP
-
-    def recent_position(self):
-        self.location = self.node.location.copy()
+        self.lives = 3
+        self.initial_location()
 
     def update(self,t):
+        self.visible = True
         self.location += self.move*self.speed*t
         move = self.check_direction()
         if (move):
@@ -29,19 +23,14 @@ class Pacman(object):
         else:
             self.move_self()
 
-    def pass_target(self):
-        if self.target is not None:
-            v1 =  self.location - self.node.location
-            v2 = self.target.location - self.node.location
-            d1 = v1.magnitudeSquared()
-            d2 = v2.magnitudeSquared()
-            return d1>=d2
-        return False
-    
-    def portal(self):
-        if (self.node.portalNode):
-            self.node = self.node.portalNode
-            self.recent_position()
+    def initial_location(self):
+        self.move = LEFT
+        for node in self.nodes.points:
+            if node.pacmanloc == True:
+                self.node = node
+                self.target = self.node.near[self.move]
+                self.recent_position()
+                self.location.x -= (self.node.location.x - self.target.location.x)/2
 
     def eatPellets(self, pelletList):
         for pellet in pelletList:
@@ -52,14 +41,23 @@ class Pacman(object):
                 return pellet
         return None
 
-    def Ghosteat(self,ghost):
-        d = self.location - ghost.location
-        d1 = d.magnitudeSquared()
-        r = (ghost.radius+self.touch)**2
-        if d1< r:
-            return True
-        return False
+    def Ghosteat(self, ghosts):
+        for ghost in ghosts.ghosts:
+            d = self.location - ghost.location
+            d1 = d.magnitudeSquared()
+            r = (ghost.radius+self.touch)**2
+            if d1 <= r:
+                return ghost
+        return None
 
+    def eatFruit(self, fruit):
+        d = self.location - fruit.location
+        d1 = d.magnitudeSquared()
+        r = (fruit.radius+self.touch)**2
+        if d1 <= r:
+            return fruit
+        return None
+    
     def check_direction(self):
         key = pygame.key.get_pressed()
         if (key[K_UP] == True):
@@ -123,30 +121,35 @@ class Pacman(object):
                 else:
                     self.recent_position()
                     self.move = STOP
-
-    def reverse(self):
-        if (self.move is UP):
-            self.move = DOWN
-        elif (self.move is DOWN):
-            self.move = UP
-        elif (self.move is LEFT):
-            self.move = RIGHT
-        elif (self.move is RIGHT):
-            self.move = LEFT
-        self.target, self.node = self.node, self.target
         
     def draw(self,screen):
-        l = (self.location.x-10,self.location.y-10)
-        pac = self.prev
-        if self.move is UP:
-            pac = pacu
-        if self.move is DOWN:
-            pac = pacd
-        if self.move is RIGHT:
-            pac = pacr
-        if self.move is LEFT:
-            pac = pacl
-        self.prev = pac
-        #l = (self.location.x,self.location.y)
-        #pygame.draw.circle(screen,yellow,l,self.radius)
-        screen.blit(pac,l)
+        if (self.visible == True):
+            l = (self.location.x-10,self.location.y-10)
+            pac = self.prev
+            if self.move is UP:
+                pac = pacu
+            if self.move is DOWN:
+                pac = pacd
+            if self.move is RIGHT:
+                pac = pacr
+            if self.move is LEFT:
+                pac = pacl
+            self.prev = pac
+            #l = (self.location.x,self.location.y)
+            #pygame.draw.circle(screen,yellow,l,self.radius)
+            screen.blit(pac,l)
+
+    def draw_lives(self,screen):
+        if self.lives >= -1:
+            for i in range(self.lives):
+                x = 7.5 + i * (5 + 30)
+                y = (game_rows - 2.5) * Tile_Height
+                screen.blit(strike_white,(x,y))
+            if self.lives < 3:
+                if self.lives < 0:
+                    self.lives = 0
+                for i in range(self.lives, 3):
+                    x = 7.5 + i * (5 + 30)
+                    y = (game_rows - 2.5) * Tile_Height
+                    screen.blit(strike_red,(x,y))
+

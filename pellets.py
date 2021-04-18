@@ -7,7 +7,7 @@ class Pellet(object):
         self.name = "pellet"
         self.location = Vector2(x, y)
         self.color = white
-        self.radius = 4
+        self.radius = 2
         self.points = 10
         self.visible = True
         

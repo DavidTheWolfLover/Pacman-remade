@@ -28,10 +28,7 @@ class Ghost(Base):
 
         self.modetime = 0 #time for a mode counting...
         self.modeCount = 0
-        self.mode = [Mode(name="SCATTER", time=7), Mode(name="CHASE", time=20), \
-                     Mode(name="SCATTER", time=7), Mode(name="CHASE", time=20), \
-                     Mode(name="SCATTER", time=5), Mode(name="CHASE", time=20), \
-                     Mode(name="SCATTER", time=5), Mode(name="CHASE")]
+        self.mode = [Mode(name="CHASE"), Mode(name="CHASE")]
         """self.reset = [Mode(name="SCATTER", time=7), Mode(name="CHASE", time=20), 
                       Mode(name="SCATTER", time=7), Mode(name="CHASE", time=20), 
                       Mode(name="SCATTER", time=5), Mode(name="CHASE", time=20), 
@@ -241,7 +238,7 @@ class Green(Ghost):
         self.name = "Green"
         self.ID = 2
         self.initial_location()
-        self.release_pellet = 30
+        self.release_pellet = 0
         self.block = [RIGHT]
         self.spawnnode = self.node
         self.guide = [UP,RIGHT]
@@ -268,7 +265,7 @@ class Purple(Ghost):
         self.name = "Purple"
         self.ID = 3
         self.initial_location()
-        self.release_pellet = 60
+        self.release_pellet = 0
         self.block = [LEFT]
         self.spawnnode = self.node
         self.guide = [UP,LEFT]

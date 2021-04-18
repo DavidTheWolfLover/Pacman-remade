@@ -5,10 +5,10 @@ from constants import *
 from nodes import Group_Nodes
 from pacman import *
 from pellets import PelletGroups
-from ghost import Group_Ghosts
+from ghost2 import Group_Ghosts
 from fruit import Fruit
 from pause import Pause
-from text import Group_Text
+from text2 import Group_Text
 
 class Level(object):
     def __init__(self):
@@ -19,7 +19,7 @@ class Level(object):
         return self.lvl[self.current_lvl % len(self.lvl)]
 
 
-class GameControl(object):
+class GameControl2(object):
     def __init__(self):
         pygame.mixer.init()
         pygame.init()
@@ -36,8 +36,10 @@ class GameControl(object):
         self.pellet_count=0
         self.fruit = None   
         self.text = Group_Text()
-        self.score = 0
-        self.highscore = 0
+
+        self.count_time = 0
+        self.time = 0
+        self.besttime = 0
 
         self.pause = Pause(True)
         self.level = Level()
@@ -55,7 +57,6 @@ class GameControl(object):
     def eat_pellets(self):
         pellet = self.pacman.eatPellets(self.pellets.pelletList)
         if (pellet):
-            self.score += pellet.points
             self.pellet_count += 1
             if (self.pellet_count == 50 or self.pellet_count == 140) and self.fruit is None:
                 self.fruit = Fruit(self.Nodes)
@@ -64,7 +65,8 @@ class GameControl(object):
             #if (self.pellet_count == 10): #debug mode (check next lvl immediately)
                 self.ghosts.hide()
                 self.pacman.visible = False
-                self.pause.start(3, "finish")
+                self.pacman.lives = 0
+                self.pause.start(3, "dead")
             if pellet.name == "powerpellet":
                 self.ghosts.reset_points()
                 self.ghosts.fright()
@@ -79,7 +81,6 @@ class GameControl(object):
         if ghost is not None:
             if ghost.mode[ghost.modeCount].name == "FRIGHT":
                 self.switch_time -= 1
-                self.score += ghost.points
                 self.text.Create_Temptxt(ghost.points,ghost.location.x-10,ghost.location.y)
                 self.ghosts.up_points()
                 ghost.spawnMode(speed=2)
@@ -105,11 +106,11 @@ class GameControl(object):
         self.pause.pauseType = None
         self.end_game = False
 
-        self.text.Reset_Color(self.highscore)
-        self.score = 0
+        self.text.Reset_Color(self.besttime)
+        self.time = 0
+        self.count_time = 0
 
         self.text.Ready()
-        self.text.Update_Level(self.level.current_lvl)
 
     def next_lvl(self):
         self.level.current_lvl += 1
@@ -125,7 +126,6 @@ class GameControl(object):
         pygame.display.update()
         time.sleep(0.8)
         self.text.Ready()
-        self.text.Update_Level(self.level.current_lvl)
 
     def restart_lvl(self):
         self.pacman.initial_location()
@@ -133,6 +133,11 @@ class GameControl(object):
         self.fruit = None
         self.pause.force(True)
         self.text.Ready()
+
+    def Time_Check(self,t):
+        self.count_time += t
+        if (int(self.count_time) - self.time == 1):
+            self.time = int(self.count_time)
 
     def update(self):
         t = self.clock.tick(60)/1000
@@ -145,12 +150,13 @@ class GameControl(object):
                     self.switch_music = False
                 #self.pacman.update()
             if self.pause.check_pause == False:
+                self.Time_Check(t)
                 if self.fruit is not None:
                     self.fruit.update(t)
                 self.pacman.update(t)
                 self.ghosts.update(t,self.pacman)
                 if self.pause.pauseType == "finish":
-                    self.resolve_clear_lvl()
+                    self.clear_lvl()
                 elif self.pause.pauseType == "dead":
                     self.resolve_restart_lvl()
                 self.eat_pellets()
@@ -161,14 +167,14 @@ class GameControl(object):
             self.pellets.update(t)
             self.text.update(t)
         self.checkEvents()
-        self.text.Update_Score(self.score)
-        if self.score > self.highscore:
-            self.highscore = self.score
-            self.text.Update_Highscore(self.highscore)
+        self.text.Update_Time(self.time)
+        if self.time > self.besttime:
+            self.besttime = self.time
+            self.text.Update_Besttime(self.besttime)
         self.redraw(t)
 
     def resolve_clear_lvl(self):
-        self.next_lvl()
+        self.level.next_lvl()
         self.pause.pauseType = None
     
     def resolve_restart_lvl(self):
@@ -223,8 +229,8 @@ class GameControl(object):
         pygame.display.update()
 
 
-'''if __name__ == "__main__":
-    game = GameControl()
+if __name__ == "__main__":
+    game = GameControl2()
     game.start_game()
     while True:
-        game.update()'''
+        game.update()
