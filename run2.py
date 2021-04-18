@@ -47,6 +47,8 @@ class GameControl2(object):
         self.chase_music = pygame.mixer.Sound("chase_theme_2.wav")
         self.switch_music = False
         self.switch_time = 0
+
+        self.quit = False
         #self.pac = pygame.transform.scale(pacr, (20, 22))
         #self.clock.tick(30)
 
@@ -210,6 +212,8 @@ class GameControl2(object):
                             self.text.Pause()
                         else:
                             self.text.Hide_All()
+                elif event.key == K_ESCAPE:
+                    self.quit = True
             #elif event.type == KEYUP:
             #    self.pacman.pressed = False
                 
@@ -229,8 +233,8 @@ class GameControl2(object):
         pygame.display.update()
 
 
-if __name__ == "__main__":
+'''if __name__ == "__main__":
     game = GameControl2()
     game.start_game()
     while True:
-        game.update()
+        game.update()'''
