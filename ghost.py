@@ -13,7 +13,6 @@ class Ghost(Base):
         self.name = "Ghost"
         self.points = 200
         self.speed = 100
-        self.prev = ghostr
         self.goal = Vector2()
         self.node = nodes.points[10]
         self.target = self.node
@@ -90,6 +89,7 @@ class Ghost(Base):
         self.goal = self.spawnnode.location
 
     def update(self, t, pacman, red = None): #DONE
+        self.visible = True
         speed = self.speed * self.mode[self.modeCount].speedMult
         self.location += self.move*speed*t
         self.updateMode(t)
@@ -183,10 +183,17 @@ class Ghost(Base):
                     ghost = ghostr[self.ID]
                 if self.move is LEFT:
                     ghost = ghostl[self.ID]
-                self.prev = ghost
-            else:
+            elif self.mode[self.modeCount].name == "FRIGHT":
                 ghost = ghosttarget
-                self.prev = ghost
+            elif self.mode[self.modeCount].name == "SPAWN":
+                if self.move is UP:
+                    ghost = au
+                if self.move is DOWN:
+                    ghost = ad
+                if self.move is RIGHT:
+                    ghost = ar
+                if self.move is LEFT:
+                    ghost = al
             screen.blit(ghost, p)
             #pygame.draw.circle(screen, self.color, p, self.radius)
 
@@ -197,6 +204,7 @@ class Red(Ghost):
         self.ID = 0
         self.initial_location()
         self.out = True
+        self.prev = ghostr[self.ID]
     
     def initial_location(self):
         for node in self.nodes.points:
@@ -212,6 +220,7 @@ class Blue(Ghost):
         self.ID = 1
         self.initial_location()
         self.out = True
+        self.prev = ghostr[self.ID]
 
     def initial_location(self):
         for node in self.nodes.points:
@@ -236,6 +245,7 @@ class Green(Ghost):
         self.block = [RIGHT]
         self.spawnnode = self.node
         self.guide = [UP,RIGHT]
+        self.prev = ghostr[self.ID]
 
     def initial_location(self):
         for node in self.nodes.points:
@@ -262,6 +272,7 @@ class Purple(Ghost):
         self.block = [LEFT]
         self.spawnnode = self.node
         self.guide = [UP,LEFT]
+        self.prev = ghostr[self.ID]
     
     def initial_location(self):
         for node in self.nodes.points:
@@ -284,8 +295,8 @@ class Purple(Ghost):
 class Group_Ghosts(object):
     def __init__(self,nodes):
         self.nodes = nodes
-        #self.ghosts = [Red(nodes), Blue(nodes), Green(nodes), Purple(nodes)]
-        self.ghosts = [Red(nodes)]
+        self.ghosts = [Red(nodes), Blue(nodes), Green(nodes), Purple(nodes)]
+        #self.ghosts = [Red(nodes)]
 
     def check_release(self,number):
         for ghost in self.ghosts:

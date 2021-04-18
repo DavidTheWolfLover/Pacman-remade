@@ -11,9 +11,11 @@ class Pacman(Base):
         self.name = "Pacman"
         self.prev =  pacr
         self.last = STOP
+        self.lives = 1
         self.initial_location()
 
     def update(self,t):
+        self.visible = True
         self.location += self.move*self.speed*t
         move = self.check_direction()
         if (move):
@@ -121,17 +123,33 @@ class Pacman(Base):
                     self.move = STOP
         
     def draw(self,screen):
-        l = (self.location.x-10,self.location.y-10)
-        pac = self.prev
-        if self.move is UP:
-            pac = pacu
-        if self.move is DOWN:
-            pac = pacd
-        if self.move is RIGHT:
-            pac = pacr
-        if self.move is LEFT:
-            pac = pacl
-        self.prev = pac
-        #l = (self.location.x,self.location.y)
-        #pygame.draw.circle(screen,yellow,l,self.radius)
-        screen.blit(pac,l)
+        if (self.visible == True):
+            l = (self.location.x-10,self.location.y-10)
+            pac = self.prev
+            if self.move is UP:
+                pac = pacu
+            if self.move is DOWN:
+                pac = pacd
+            if self.move is RIGHT:
+                pac = pacr
+            if self.move is LEFT:
+                pac = pacl
+            self.prev = pac
+            #l = (self.location.x,self.location.y)
+            #pygame.draw.circle(screen,yellow,l,self.radius)
+            screen.blit(pac,l)
+
+    def draw_lives(self,screen):
+        if self.lives >= -1:
+            for i in range(self.lives):
+                x = 7.5 + i * (5 + 30)
+                y = (game_rows - 2.5) * Tile_Height
+                screen.blit(strike_white,(x,y))
+            if self.lives < 3:
+                if self.lives < 0:
+                    self.lives = 0
+                for i in range(self.lives, 3):
+                    x = 7.5 + i * (5 + 30)
+                    y = (game_rows - 2.5) * Tile_Height
+                    screen.blit(strike_red,(x,y))
+

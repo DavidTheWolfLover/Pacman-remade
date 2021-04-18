@@ -202,3 +202,4 @@ class Group_Nodes(object):
             i.draw_near(screen)
         #for i in range(len(self.points)-15,len(self.points)):
         #    self.points[i].draw_near(screen)
+

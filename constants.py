@@ -19,6 +19,7 @@ pink = (255, 100, 150)
 teal = (100, 255, 255)
 orange = (230, 190, 40)
 matcha = (0, 255, 170)
+orange = (255, 85, 0)
 
 UP = Vector2(0,-1)
 DOWN = Vector2(0,1)
@@ -53,10 +54,18 @@ pl = pygame.image.load(os.path.join("assets","purpleleftsmall.png"))
 pu = pygame.image.load(os.path.join("assets","purpleupsmall.png"))
 pd = pygame.image.load(os.path.join("assets","purpledownsmall.png"))
 
+ar = pygame.image.load(os.path.join("assets","eyesrightsmall.png"))
+al = pygame.image.load(os.path.join("assets","eyesleftsmall.png"))
+au = pygame.image.load(os.path.join("assets","eyesupsmall.png"))
+ad = pygame.image.load(os.path.join("assets","eyesdownsmall.png"))
+
 ghostr = [rr,br,gr,pr]
 ghostl = [rl,bl,gl,pl]
 ghostu = [ru,bu,gu,pu]
 ghostd = [rd,bd,gd,pd]
+
+strike_white = pygame.image.load(os.path.join("assets","strike-white.png"))
+strike_red = pygame.image.load(os.path.join("assets","strike-red.png"))
 
 ghosttarget = pygame.image.load(os.path.join("assets","targetghostsmall.png"))
 ghosttargetr = pygame.image.load(os.path.join("assets","targetghostrevertsmall.png"))
