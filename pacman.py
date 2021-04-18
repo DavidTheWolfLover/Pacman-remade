@@ -11,7 +11,7 @@ class Pacman(Base):
         self.name = "Pacman"
         self.prev =  pacr
         self.last = STOP
-        self.lives = 1
+        self.lives = 3
         self.initial_location()
 
     def update(self,t):

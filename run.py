@@ -68,14 +68,17 @@ class GameControl(object):
             if pellet.name == "powerpellet":
                 self.ghosts.reset_points()
                 self.ghosts.fright()
+                self.chase_music.stop()
                 self.chase_music.play()
                 pygame.mixer.music.pause()
                 self.switch_music = True
+                self.switch_time = 0
     
     def eat_ghost(self):
         ghost = self.pacman.Ghosteat(self.ghosts)
         if ghost is not None:
             if ghost.mode[ghost.modeCount].name == "FRIGHT":
+                self.switch_time -= 1
                 self.score += ghost.points
                 self.text.Create_Temptxt(ghost.points,ghost.location.x-10,ghost.location.y)
                 self.ghosts.up_points()
@@ -180,7 +183,7 @@ class GameControl(object):
         if self.fruit is not None:
             if self.pacman.eatFruit(self.fruit) is not None:
                 self.score += self.fruit.points
-                self.text.Create_Temptxt(self.fruit.points,self.pacman.location.x,self.pacman.location.y)
+                self.text.Create_Temptxt(self.fruit.points,self.fruit.location.x-10,self.fruit.location.y)
                 self.fruit = None
             elif self.fruit.disappear == True:
                 self.fruit = None
