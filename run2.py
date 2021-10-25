@@ -191,7 +191,6 @@ class GameControl2(object):
     def check_fruit(self):
         if self.fruit is not None:
             if self.pacman.eatFruit(self.fruit) is not None:
-                self.score += self.fruit.points
                 self.text.Create_Temptxt(self.fruit.points,self.fruit.location.x-10,self.fruit.location.y)
                 self.fruit = None
             elif self.fruit.disappear == True:

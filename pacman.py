@@ -60,13 +60,13 @@ class Pacman(Base):
     
     def check_direction(self):
         key = pygame.key.get_pressed()
-        if (key[K_UP] == True):
+        if (key[K_UP] == True or key[K_w] == True):
             return UP
-        if (key[K_DOWN] == True):
+        if (key[K_DOWN] == True or key[K_s] == True):
             return DOWN
-        if (key[K_LEFT] == True):
+        if (key[K_LEFT] == True or key[K_a] == True):
             return LEFT
-        if (key[K_RIGHT] == True):
+        if (key[K_RIGHT] == True or key[K_d] == True):
             return RIGHT
         return None
 

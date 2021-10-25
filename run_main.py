@@ -7,14 +7,17 @@ from constants import *
 
 
 def main_run():
+    pygame.mixer.init()
     pygame.init()
+    pygame.mixer.music.load('Pac-man theme 1.mp3')
+    pygame.mixer.music.play(-1, 0.0)
     pygame.display.set_caption('Pacman Remake')
     pygame.display.set_icon(icon) 
     clock = pygame.time.Clock()
     screen = pygame.display.set_mode(screen_size, 0, 32)
     font = pygame.font.Font("PressStart2P-Regular.ttf", 16)
     font1 = pygame.font.Font("PressStart2P-Regular.ttf", 18)
-    text1 = font.render("Normal", 1, black)
+    text1 = font.render("Classic", 1, black)
     text2 = font.render("Chase", 1, black)
     text3 = font.render("Made by Tri, Khoa & Duc", 1, matcha)
     text4 = font1.render("GET READY & HAVE FUN ^^!", 1, yellow)
@@ -56,7 +59,7 @@ def main_run():
         pygame.draw.rect(screen, red, button1)
         pygame.draw.rect(screen, green, button2)
         screen.blit(logo,(0,70))
-        p1 = (80, 370)
+        p1 = (70, 370)
         screen.blit(text1, p1)
         p2 = (285, 370)
         screen.blit(text2, p2)
