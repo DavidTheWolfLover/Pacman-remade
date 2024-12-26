@@ -36,7 +36,7 @@ class Text(object):
 
 class Group_Text(object):
     def __init__(self):
-        self.texts = [Text("READY :)",matcha,160,330,16), 
+        self.texts = [Text("SPACE TO START",matcha,105,330,16), 
                       Text("GAME OVER!",red,151,330,16),
                       Text("TIME",orange,10,10,16),
                       Text("BEST TIME",orange,160,10,16),
